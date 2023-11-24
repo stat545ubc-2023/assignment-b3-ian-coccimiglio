@@ -7,6 +7,8 @@ library(bslib)
 # simulates a biological system that tends towards damped oscillation.
 # Users can change the INDIVIDUAL parameters and the simulation time.
 # Outcomes are changes in the phase-space diagram and the time-concentration plot.
+
+#compile <- !file.exists(paste0("BrusselC", .Platform$dynlib.ext))
 osc2 <- cOde::funC(
     c(
         X = "-b1*Y - a1*X",
@@ -76,12 +78,12 @@ ui <- fluidPage(
                 sidebarPanel(
                     "Parameters for X",
                     hr(),
-                    sliderInput("alpha1", "Degradation X (\u03B11)", min = 1, max = 20, value = 1),
-                    sliderInput("beta1", "Formation X (\u03B21)", min = 1, max = 20, value = 8),
+                    sliderInput("alpha1", "Degradation X (\u03B11)", min = 0, max = 20, value = 1),
+                    sliderInput("beta1", "Formation X (\u03B21)", min = 0, max = 20, value = 8),
                     "Parameters for Y",
                     hr(),
-                    sliderInput("alpha2", "Degradation Y (\u03B12)", min = 1, max = 20, value = 1),
-                    sliderInput("beta2", "Formation Y (\u03B22)", min = 1, max = 20, value = 8),
+                    sliderInput("alpha2", "Degradation Y (\u03B12)", min = 0, max = 20, value = 1),
+                    sliderInput("beta2", "Formation Y (\u03B22)", min = 0, max = 20, value = 8),
                     "Simulation Parameters",
                     hr(),
                     sliderInput("len", "Simulation Time", min = 1, max = 50, value = 6),
