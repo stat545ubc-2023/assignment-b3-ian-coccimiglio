@@ -3,6 +3,13 @@
 
 # Assignment-B3: Biological Oscillation.
 
+## Usage
+
+Run the Shiny App located in /Alon_Oscillator/. All of the models should
+already be compiled there.
+
+## Design
+
 Here, I design and create a series of biological oscillators as
 described in *Uri Alon - An Introduction to Systems Biology* - Chapter
 6. The goal is to show how we can model these dynamical processes in R,

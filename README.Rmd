@@ -13,6 +13,12 @@ knitr::opts_chunk$set(
 
 # Assignment-B3: Biological Oscillation.
 
+## Usage
+
+Run the Shiny App located in /Alon_Oscillator/. All of the models should already be compiled there.
+
+## Design
+
 Here, I design and create a series of biological oscillators as described in *Uri Alon - An Introduction to Systems Biology* - Chapter 6. The goal is to show how we can model these dynamical processes in R, and allow users to moderate the parameters through an interactive GUI. Additionally, it gives context to which conditions lead to oscillations, and which lead to flat systems.
 
 The system is solved using the deSolve and cOde packages, which allow for fast solving and compilation of systems of ordinary differential equations.
