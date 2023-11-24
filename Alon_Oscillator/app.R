@@ -84,7 +84,8 @@ ui <- fluidPage(
                     sliderInput("beta2", "Formation Y (\u03B22)", min = 1, max = 20, value = 8),
                     "Simulation Parameters",
                     hr(),
-                    sliderInput("len", "Simulation Time", min = 1, max = 50, value = 6)
+                    sliderInput("len", "Simulation Time", min = 1, max = 50, value = 6),
+                    checkboxInput("addnoise", "Noise", value = FALSE)
                 ),
 
                 mainPanel(
@@ -208,11 +209,35 @@ server <- function(input, output) {
     }, deleteFile = FALSE)
 
     output$dampOsc <- renderPlot({
-        par(mfrow=c(1,2))
+
+        noisefreq = 10
+        step = 0.01
+        times_noise = seq(0,input$len,1/noisefreq)
+        times = seq(0,input$len,step)
+
         y0 <- c(X=1,Y=1)
         k_list <- c(b1=input$beta1, b2=input$beta2, a1=input$alpha1, a2=input$alpha2)
-        step=0.01
-        damp_osc <- odeC(y=y0, times=seq(0,input$len,step), func=osc2, parms = k_list)
+
+        if(input$addnoise == TRUE) {
+            noisy <- data.frame(name=rep("noise",
+                                input$len*noisefreq+1),
+                                time=times_noise,
+                                value=rnorm(input$len*noisefreq+1))
+        }
+        else {
+            noisy <- data.frame(name=rep("noise",
+                                input$len*noisefreq+1),
+                                time=times_noise,
+                                value=rep(0, input$len*noisefreq+1))
+        }
+
+
+        pars <- c(b1=8, b2=8, a1=1, a2=1)
+        forc <- setForcings(noise, noisy)
+
+        damp_osc <- odeC(y=y0, times=times, func=noise, parms = k_list, forcings=forc)
+
+        par(mfrow=c(1,2))
         plot(damp_osc[,1], damp_osc[,2], type='l',
              xlab = "Time",
              ylab = "Concentration")
