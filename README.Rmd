@@ -13,23 +13,28 @@ knitr::opts_chunk$set(
 
 # Assignment-B3: Biological Oscillation.
 
-Here, I design and create a series of biological oscillators as described in *Uri Alon - An Introduction to Systems Biology* - Chapter 6. The goal is to show how we can model these dynamical processes in R, and allow users to moderate the parameters through an interactive GUI.
+Here, I design and create a series of biological oscillators as described in *Uri Alon - An Introduction to Systems Biology* - Chapter 6. The goal is to show how we can model these dynamical processes in R, and allow users to moderate the parameters through an interactive GUI. Additionally, it gives context to which conditions lead to oscillations, and which lead to flat systems.
 
 The system is solved using the deSolve and cOde packages, which allow for fast solving and compilation of systems of ordinary differential equations.
 
-First, we build a damped oscillator, which is a two-component system. It comes with a dynamic user interface to edit the simulation time and the individual rate parameters.
-
-```{r}
-
+### First, we build a damped oscillator.
+This is a two-component system. It comes with a dynamic user interface to edit the simulation time and the individual rate parameters. This was modelled after Chapter 6.1 in Uri Alon's book.
+```{r, echo=FALSE, fig.cap="Damped Oscillations", out.width = '100%'}
+    knitr::include_graphics("Alon_Oscillator/Damped.png")
 ```
 
-Next, we build an undamped multi-component oscillator. This has the capacity to oscillate indefinitely, even without noise. Here, we showcase a 3-component system, in which each component has negative feedback on the following component.
+### Next, we build an undamped 3-component oscillator
+Also known as a *repressilator*. Here, we showcase a system in which each component has negative feedback on the following component. This has the capacity to oscillate indefinitely. The ideas for the specific ODE system were modeled after work done by Michael Elowitz, here: https://biocircuits.github.io/chapters/09_repressilator.html
 
-```{r pressure, echo = FALSE}
-plot(pressure)
+```{r, echo=FALSE, fig.cap="3 Component Oscillation", out.width = '100%'}
+    knitr::include_graphics("Alon_Oscillator/Repression.png")
 ```
 
-Finally, we showcase a coupled feedback loop, which has two components, but one component is autoregulated with positive feedback. This creates oscillations using only two components and without noise.
+### Finally, we showcase the Brusselator
+Thich has two intermediary components, X and Y, under investgation, but the mechanism can produce stable oscillations. This was modeled after work done by Thomas Petzoldt, here: https://tpetzoldt.github.io/deSolve-shiny/deSolve-shiny.html
 
-```{r}
+```{r, echo=FALSE, fig.cap="Brusselator visualization", out.width = '100%'}
+    knitr::include_graphics("Alon_Oscillator/Brusselation.png")
 ```
+
+I hope you find this work interesting, and allows you to visualize the mathematics underlying oscillations!
