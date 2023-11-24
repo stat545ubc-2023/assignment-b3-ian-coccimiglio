@@ -5,8 +5,11 @@
 
 ## Usage
 
-Run the Shiny App located in /Alon_Oscillator/app.R. All of the models
-should already be compiled there.
+Run the Shiny App locally in the subfolder found in
+/Alon_Oscillator/app.R. All of the models are compiled there.
+
+Alternatively, head over the
+<https://ian-fc.shinyapps.io/Alon_Oscillator/> to use it over the web!
 
 ## Design
 
