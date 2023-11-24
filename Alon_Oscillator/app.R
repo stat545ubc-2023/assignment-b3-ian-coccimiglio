@@ -172,7 +172,7 @@ server <- function(input, output) {
     )
 
     output$Brussel <- renderPlot({
-        par(mfrow=c(2,1))
+        par(mfrow=c(1,2))
         X_Conc_Bruss <- 2
         Y_Conc_Bruss <- 2
         y0_3 <- c(X=X_Conc_Bruss,Y=Y_Conc_Bruss)
