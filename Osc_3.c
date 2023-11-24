@@ -13,7 +13,7 @@ static double range[2];
 
 #define beta parms[0] 
  #define k parms[1] 
- #define g2 parms[2] 
+ #define b2 parms[2] 
  #define y0_0 parms[3] 
  #define y1_0 parms[4] 
  #define y2_0 parms[5] 
@@ -36,9 +36,9 @@ void Osc_3_derivs (int *n, double *t, double *y, double *ydot, double *RPAR, int
 
 	 double time = *t;
 
-	 ydot[0] = beta/(1.0+(pow((y[2]/k),3.0)))-g2*y[0];
- 	 ydot[1] = beta/(1.0+(pow((y[0]/k),3.0)))-g2*y[1];
- 	 ydot[2] = beta/(1.0+(pow((y[1]/k),3.0)))-g2*y[2];
+	 ydot[0] = beta/(1.0+pow((y[2]/k),3.0))-b2*y[0];
+ 	 ydot[1] = beta/(1.0+pow((y[0]/k),3.0))-b2*y[1];
+ 	 ydot[2] = beta/(1.0+pow((y[1]/k),3.0))-b2*y[2];
 
 }
 

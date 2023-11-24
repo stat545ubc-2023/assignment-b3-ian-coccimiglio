@@ -1,15 +1,7 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
 library(cOde)
 library(deSolve)
+library(bslib)
 
 # Feature 1, Creating a damped biological oscillator. This compiles an object which
 # simulates a biological system that tends towards damped oscillation.
@@ -22,6 +14,19 @@ osc2 <- cOde::funC(
     ), modelname = "Alon_damped", compile=TRUE
 )
 
+forcings <- c("noise")
+noise <- cOde::funC(
+    c(
+        X = "-b1*Y - a1*X",
+        Y = "b2*(X+noise) - a2*Y"
+    ),
+    forcings = forcings,
+    modelname = "damped_noise",
+    compile=TRUE,
+    fcontrol = "nospline",
+    nGridpoints = 10
+)
+
 ## Feature 2, Creating a 3-part repressilator. This compiles an object which
 # simulates a 3 component system that tends towards infinite oscillations.
 # Users are able to change the global degradation, creation, and concentration constants.
@@ -30,9 +35,9 @@ osc2 <- cOde::funC(
 osc3 <- cOde::funC(
     c(
         # 1 and 3 are rate constants for the purposes of this demo.
-        X = "beta/(1+(Z/k)^3) - g2*X",
-        Y = "beta/(1+(X/k)^3) - g2*Y",
-        Z = "beta/(1+(Y/k)^3) - g2*Z"
+        X = "beta/(1+((Z/k)^3)) - g2*X",
+        Y = "beta/(1+((X/k)^3)) - g2*Y",
+        Z = "beta/(1+((Y/k)^3)) - g2*Z"
     ),
     modelname = "Osc_3", compile=TRUE
 )
@@ -49,24 +54,51 @@ brussC <- cOde::funC(
     ), modelname = "brusselC", compile=TRUE
 )
 
+# Extra, this is a repression function that allows modification of N
+repress_R <- function(Time, State, Pars) {
+    with(as.list(c(State, Pars)), {
+        dX    <- beta/(1+((Z/k)^n)) - g2*X
+        dY   <- beta/(1+((X/k)^n)) - g2*Y
+        dZ <- beta/(1+((Y/k)^n)) - g2*Z
+
+        return(list(c(dX, dY, dZ)))
+    })
+}
+
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
+    theme = bs_theme(version = 4, bootswatch = "minty"),
     titlePanel("Biological Oscillations"),
     tabsetPanel(
         tabPanel("Damped Biological Oscillator",
             sidebarLayout(
                 sidebarPanel(
+                    "Parameters for X",
+                    hr(),
                     sliderInput("alpha1", "Degradation X (\u03B11)", min = 1, max = 20, value = 1),
                     sliderInput("beta1", "Formation X (\u03B21)", min = 1, max = 20, value = 8),
+                    "Parameters for Y",
+                    hr(),
                     sliderInput("alpha2", "Degradation Y (\u03B12)", min = 1, max = 20, value = 1),
                     sliderInput("beta2", "Formation Y (\u03B22)", min = 1, max = 20, value = 8),
+                    "Simulation Parameters",
+                    hr(),
                     sliderInput("len", "Simulation Time", min = 1, max = 50, value = 6)
                 ),
 
                 mainPanel(
+                         withMathJax("$$\\text{Damped Oscillation System }$$ \
+                                     $$\\frac{dX}{dt}=-\\beta_1Y - \\alpha_1X$$ \
+                                     $$\\frac{dY}{dt}=\\beta_2X - \\alpha_2Y$$"),
                          plotOutput("dampOsc"),
-                         imageOutput("damp"),
+
+                         htmlOutput("eigenvalue"),
+                         htmlOutput("jaxeign"),
+                         htmlOutput("feedback"),
+                         htmlOutput("mismatch"),
+                         imageOutput("damp", height="200px")
+
                 )
             )
         ),
@@ -74,14 +106,22 @@ ui <- fluidPage(
         tabPanel("Repressilator",
                  sidebarLayout(
                      sidebarPanel(
+                         "Rate constants",
+                         hr(),
                          sliderInput("Beta", "Protein Generation Rate (\u03B2)", min = 0, max = 20, value = 1),
-                         sliderInput("k", "Protein Concentration Factor", min = 1, max = 20, value = 1),
                          sliderInput("Gamma", "Protein Degradation Rate (\u03B3)", min = 0, max = 5, value = 0.1, step=0.1),
+                         "Simulation parameters",
+                         hr(),
+                         sliderInput("k", "Protein Concentration Factor", min = 1, max = 20, value = 1),
                          sliderInput("len_2", "Simulation Length", min = 1, max = 1000, value = 300)
                      ),
 
                      # Show a plot of the generated distribution
                      mainPanel(
+                         div("$$\\text{Repressilation System }$$ \
+                                     $$\\frac{dX}{dt}=\\frac{\\beta}{1+(Z/k)^3} - \\gamma{X}$$ \
+                                     $$\\frac{dY}{dt}=\\frac{\\beta}{1+(X/k)^3} - \\gamma{Y}$$ \
+                                     $$\\frac{dZ}{dt}=\\frac{\\beta}{1+(Y/k)^3} - \\gamma{Z}$$"),
                          plotOutput("Osc3"),
                          imageOutput("repress")
                      )
@@ -92,23 +132,57 @@ ui <- fluidPage(
         tabPanel("Brusselator",
              sidebarLayout(
                  sidebarPanel(
+                     "Generative parameters",
+                     hr(),
                      sliderInput("A", "Autocatalytic A", min = 1, max = 20, value = 1),
                      sliderInput("B", "Autocatalytic B", min = 1, max = 20, value = 3),
+                     "Rate constants",
+                     hr(),
                      sliderInput("k1", "Catalytic Rate A (k1)", min = 1, max = 20, value = 1),
                      sliderInput("k2", "Catalytic Rate B (k2)", min = 1, max = 20, value = 1),
                      sliderInput("k3", "XY binding rate (k3)", min = 1, max = 20, value = 1),
                      sliderInput("k4", "X degradation rate (k4)", min = 1, max = 20, value = 1),
+                     "Simulation parameters",
+                     hr(),
                      sliderInput("len_3", "Simulation Time", min = 1, max = 200, value = 50)
                  ),
 
                  # Show a plot of the generated distribution
                  mainPanel(
+                     div("$$\\text{Brusselator System }$$ \
+                                     $$\\frac{dX}{dt}= k_1A - k_2B + k_3X^2Y - k_4X - \\gamma{X}$$ \
+                                     $$\\frac{dY}{dt}= k_2BX - k_3X^2Y - \\gamma{Y}$$"),
                      plotOutput("Brussel"),
                      imageOutput("brussel")
                  )
              )
-        )
+        ),
+        tabPanel("Repression_2",
+                 sidebarLayout(
+                     sidebarPanel(
+                         "Rate constants",
+                         hr(),
+                         sliderInput("Beta_2", "Maximal Rate (\u03B2)", min = 0, max = 20, value = 1),
+                         sliderInput("Gamma_2", "Degradation Rate (\u03B3)", min = 0, max = 5, value = 0.1, step=0.1),
+                         sliderInput("N", "Cooperativity (n)", min = 0, max = 5, value = 1, step=0.1),
+                         "Simulation parameters",
+                         hr(),
+                         sliderInput("k_2", "Protein Concentration Factor", min = 1, max = 20, value = 1),
+                         sliderInput("len_4", "Simulation Length", min = 1, max = 1000, value = 300)
+                     ),
 
+                     # Show a plot of the generated distribution
+                     mainPanel(
+                         h5("This repressilation system allows you to see the impact of cooperativity"),
+                         div("$$\\text{Repressilation System }$$ \
+                                     $$\\frac{dX}{dt}=\\frac{\\beta}{1+(Z/k)^n} - \\gamma{X}$$ \
+                                     $$\\frac{dY}{dt}=\\frac{\\beta}{1+(X/k)^n} - \\gamma{Y}$$ \
+                                     $$\\frac{dZ}{dt}=\\frac{\\beta}{1+(Y/k)^n} - \\gamma{Z}$$"),
+                         plotOutput("Rep2")
+                         #imageOutput("repress")
+                     )
+                 )
+        )
     )
 )
 
@@ -171,6 +245,29 @@ server <- function(input, output) {
     }
     )
 
+    output$Rep2 <- renderPlot({
+        par(mfrow=c(1,2))
+        Z_Conc = 3
+        Y_Conc = 2
+        X_Conc = 1
+        yini <- c(X=X_Conc,Y=Y_Conc,Z=Z_Conc)
+        pars <- c(beta=input$Beta_2, k=input$k_2, n=input$N, g2=input$Gamma_2)
+        step=0.2
+        times <- seq(0,input$len_4,step)
+        out_rep <- ode(yini, times, repress_R, pars)
+        plot(out_rep[,1], out_rep[,2], col='black', type='l',
+             xlab = "Time",
+             ylab = "Concentration",
+             ylim = c(0, max(out_rep[,2:4])))
+        lines(out_rep[,1], out_rep[,3], col='red')
+        lines(out_rep[,1], out_rep[,4], col='blue')
+        plot(out_rep[,2], out_rep[,3], col='black', type='l',
+             xlab = "Concentration X",
+             ylab = "Concentration Y"
+        )
+    }
+    )
+
     output$Brussel <- renderPlot({
         par(mfrow=c(1,2))
         X_Conc_Bruss <- 2
@@ -179,7 +276,8 @@ server <- function(input, output) {
         k_list3 <- c(A=input$A, B=input$B, k1=input$k1, k2=input$k2, k3=input$k3, k4=input$k4)
         step=0.1
         ode_bruss <- odeC(y=y0_3, times=seq(0,input$len_3,step), func=brussC, parms = k_list3)
-        plot(ode_bruss[,1], ode_bruss[,2],col='black', type='l',ylim=c(0,8),
+        height = max(ode_bruss[,2:3])
+        plot(ode_bruss[,1], ode_bruss[,2],col='black', type='l',ylim=c(0,height),
              xlab = "Time",
              ylab = "Concentration")
         lines(ode_bruss[,1], ode_bruss[,3],col='blue')
@@ -188,6 +286,29 @@ server <- function(input, output) {
              ylab = "Concentration Y")
     }
     )
+
+    RHS=reactive(4*(input$beta1*input$beta2))
+    LHS=reactive((input$alpha1-input$alpha2)^2)
+    eign <- reactive({RHS()-LHS()})
+
+    output$jaxeign <- renderText({
+        if( eign() > 0){
+            return(paste(withMathJax('$$(\\alpha_1-\\alpha_2)^2 < 4\\beta_1\\beta_2$$')))
+        } else{
+            return(paste(withMathJax('$$(\\alpha_1-\\alpha_2)^2 > 4\\beta_1\\beta_2$$')))
+        }
+    }
+    )
+
+    output$feedback <- renderText({paste("Feedback Strength = ", RHS())})
+    output$mismatch <- renderText({paste("Squared mismatch = ", LHS())})
+
+    output$eigenvalue<- renderText({
+        if(eign() > 0){
+            return(paste('Damped oscillations <span style=\"color:green\">are</span> occurring'))
+        }else{
+            return(paste("Damped oscillations <span style=\"color:red\">are not</span> occurring"))
+    }})
 }
 
 # Run the application
