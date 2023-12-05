@@ -19,6 +19,8 @@ Run the Shiny App locally in the subfolder found in /Alon_Oscillator/app.R. All 
 
 Alternatively, head over the https://ian-fc.shinyapps.io/Alon_Oscillator/ to use it over the web!
 
+The updated online version for Assignment-4 is located at https://ian-fc.shinyapps.io/Alon_Oscillator_Updated/.
+
 ## Design
 
 Here, I design and create a series of biological oscillators as described in *Uri Alon - An Introduction to Systems Biology* - Chapter 6. The goal is to show how we can model these dynamical processes in R, and allow users to moderate the parameters through an interactive GUI. Additionally, it gives context to which conditions lead to oscillations, and which lead to flat systems.
