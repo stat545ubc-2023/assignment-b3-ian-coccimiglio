@@ -5,7 +5,11 @@ account: ian-fc
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 10615054
+<<<<<<< HEAD
 bundleId: 7966105
+=======
+bundleId: 8008637
+>>>>>>> bb385ae803b2a2d830576e84a7c60a423ba2388e
 url: https://ian-fc.shinyapps.io/Alon_Oscillator/
 version: 1
 asMultiple: FALSE

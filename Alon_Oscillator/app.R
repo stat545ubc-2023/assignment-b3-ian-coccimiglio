@@ -234,7 +234,6 @@ server <- function(input, output) {
         }
 
 
-        pars <- c(b1=8, b2=8, a1=1, a2=1)
         forc <- setForcings(noise, noisy)
 
         damp_osc <- odeC(y=y0, times=times, func=noise, parms = k_list, forcings=forc)

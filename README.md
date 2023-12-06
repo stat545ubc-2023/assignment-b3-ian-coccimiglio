@@ -11,6 +11,9 @@ Run the Shiny App locally in the subfolder found in
 Alternatively, head over the
 <https://ian-fc.shinyapps.io/Alon_Oscillator/> to use it over the web!
 
+The updated online version for Assignment-4 is located at
+<https://ian-fc.shinyapps.io/Alon_Oscillator_Updated/>.
+
 ## Design
 
 Here, I design and create a series of biological oscillators as
