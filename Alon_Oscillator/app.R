@@ -93,7 +93,7 @@ ui <- fluidPage(
 
                 mainPanel(
                          h5("Damped oscillations occur in specific circumstances"),
-                         "This model shows a 2-component system, where a protein/factor X activates another protein/factor Y, but Y also represses X.",
+                         "This model shows a 2-component system, where a protein/factor X activates another protein/factor Y, but Y also represses X. These are controlled by the ordinary differential equations below - change the beta and alpha parameters to see which conditions lead to oscillations.",
                          withMathJax("$$\\text{Damped Oscillation System }$$ \
                                      $$\\frac{dX}{dt}=-\\beta_1Y - \\alpha_1X$$ \
                                      $$\\frac{dY}{dt}=\\beta_2X - \\alpha_2Y$$"),
@@ -102,6 +102,7 @@ ui <- fluidPage(
                          htmlOutput("jaxeign"),
                          htmlOutput("feedback"),
                          htmlOutput("mismatch"),
+                         "Depending on the above inequality, if the \u03B2 feedback strength exceeds the squared mismatch in \u03B1 degradation, damped oscillations are become likely to occur (relative to monotonic behaviour).",
                          imageOutput("damp", height="200px"),
                          br(),
                          "If a moderate amount of noise is added, a damped oscillation system will start to oscillate indefinitely",
@@ -358,8 +359,8 @@ server <- function(input, output) {
     }
     )
 
-    output$feedback <- renderText({paste("Feedback Strength = ", RHS())})
-    output$mismatch <- renderText({paste("Squared mismatch = ", LHS())})
+    output$feedback <- renderText({paste("Feedback Strength = (\u03B11-\u03B12)^2 = ", RHS())})
+    output$mismatch <- renderText({paste("Squared mismatch = 4*(\u03B21*\u03B22) = ", LHS())})
 
     output$eigenvalue<- renderText({
         if(eign() > 0){
