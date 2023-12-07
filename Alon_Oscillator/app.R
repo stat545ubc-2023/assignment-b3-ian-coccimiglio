@@ -189,8 +189,8 @@ ui <- fluidPage(
 
                      # Show a plot of the generated distribution
                      mainPanel(
-                         h5("This repressilation system allows you to see the impact of cooperativity"),
-                         "As cooperativity (n) increases above 2, a system of stable oscillations occurs. It is positively impacted by the beta parameter, and negatively by the gamma parameter",
+                         h5("This repressilation system is the same as before, but allows you to see the impact of cooperativity"),
+                         "If you increase cooperativity (n) above 2, a system of stable oscillations occurs. It is positively impacted by the beta parameters, and negatively by the gamma parameters",
                          div("$$\\text{Repressilation System }$$ \
                                      $$\\frac{dX}{dt}=\\frac{\\beta}{1+(Z/k)^n} - \\gamma{X}$$ \
                                      $$\\frac{dY}{dt}=\\frac{\\beta}{1+(X/k)^n} - \\gamma{Y}$$ \
