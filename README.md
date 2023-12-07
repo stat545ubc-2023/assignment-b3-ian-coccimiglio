@@ -8,7 +8,7 @@
 Run the Shiny App locally in the subfolder found in
 /Alon_Oscillator/app.R. All of the models are compiled there.
 
-For the original version Assignment-B3 version of this app, check out
+For the original Assignment-B3 version of this app, check out
 <https://ian-fc.shinyapps.io/Alon_Oscillator/>
 
 The updated online version for Assignment-B4 is located at
