@@ -86,7 +86,7 @@ ui <- fluidPage(
                     sliderInput("beta2", "Formation Y (\u03B22)", min = 0, max = 20, value = 8),
                     "Simulation Parameters",
                     hr(),
-                    sliderInput("len", "Simulation Time", min = 1, max = 50, value = 6),
+                    sliderInput("len", "Simulation Time", min = 1, max = 50, value = 15),
                     "Click to add a small amount of random, normal noise (mu=0, sd=1).",
                     checkboxInput("addnoise", "Add Random Noise", value = FALSE)
                 ),
@@ -271,6 +271,7 @@ server <- function(input, output) {
              xlab = "Time",
              ylab = "Concentration")
         lines(damp_osc[,1], damp_osc[,3], col='red', type='l')
+        legend("topright", legend=c("Concentration X", "Concentration Y"), col=c("black", "red"), lty=1, cex=0.8)
         plot(damp_osc[,2], damp_osc[,3], type='l',
              xlab = "Concentration X",
              ylab = "Concentration Y"
@@ -292,6 +293,7 @@ server <- function(input, output) {
              ylab = "Concentration")
         lines(osc_3[,1], osc_3[,3], col='red')
         lines(osc_3[,1], osc_3[,4], col='blue')
+        legend("topright", legend=c("Concentration X", "Concentration Y", "Concentration Z"), col=c("black", "red", "blue"), lty=1, cex=0.8)
         plot(osc_3[,2], osc_3[,3], col='black', type='l',
              xlab = "Concentration X",
              ylab = "Concentration Y"
@@ -315,6 +317,7 @@ server <- function(input, output) {
              ylim = c(0, max(out_rep[,2:4])))
         lines(out_rep[,1], out_rep[,3], col='red')
         lines(out_rep[,1], out_rep[,4], col='blue')
+        legend("topright", legend=c("Concentration X", "Concentration Y", "Concentration Z"), col=c("black", "red", "blue"), lty=1, cex=0.8)
         plot(out_rep[,2], out_rep[,3], col='black', type='l',
              xlab = "Concentration X",
              ylab = "Concentration Y"
@@ -335,6 +338,7 @@ server <- function(input, output) {
              xlab = "Time",
              ylab = "Concentration")
         lines(ode_bruss[,1], ode_bruss[,3],col='blue')
+        legend("topright", legend=c("Concentration X", "Concentration Y"), col=c("black", "blue"), lty=1, cex=0.8)
         plot(ode_bruss[,2], ode_bruss[,3],type='l',
              xlab = "Concentration X",
              ylab = "Concentration Y")
