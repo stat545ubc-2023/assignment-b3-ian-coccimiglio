@@ -87,50 +87,28 @@ ui <- fluidPage(
                     "Simulation Parameters",
                     hr(),
                     sliderInput("len", "Simulation Time", min = 1, max = 50, value = 6),
-                    checkboxInput("addnoise", "Noise", value = FALSE)
+                    "Click to add a small amount of random, normal noise (mu=0, sd=1).",
+                    checkboxInput("addnoise", "Add Random Noise", value = FALSE)
                 ),
 
                 mainPanel(
+                         h5("Damped oscillations occur in specific circumstances"),
+                         "This model shows a 2-component system, where a protein/factor X activates another protein/factor Y, but Y also represses X.",
                          withMathJax("$$\\text{Damped Oscillation System }$$ \
                                      $$\\frac{dX}{dt}=-\\beta_1Y - \\alpha_1X$$ \
                                      $$\\frac{dY}{dt}=\\beta_2X - \\alpha_2Y$$"),
                          plotOutput("dampOsc"),
-
                          htmlOutput("eigenvalue"),
                          htmlOutput("jaxeign"),
                          htmlOutput("feedback"),
                          htmlOutput("mismatch"),
-                         imageOutput("damp", height="200px")
-
+                         imageOutput("damp", height="200px"),
+                         br(),
+                         "If a moderate amount of noise is added, a damped oscillation system will start to oscillate indefinitely",
+                         uiOutput("alonlink")
                 )
             )
         ),
-
-        tabPanel("Repressilator",
-                 sidebarLayout(
-                     sidebarPanel(
-                         "Rate constants",
-                         hr(),
-                         sliderInput("Beta", "Protein Generation Rate (\u03B2)", min = 0, max = 20, value = 1),
-                         sliderInput("Gamma", "Protein Degradation Rate (\u03B3)", min = 0, max = 5, value = 0.1, step=0.1),
-                         "Simulation parameters",
-                         hr(),
-                         sliderInput("k", "Protein Concentration Factor", min = 1, max = 20, value = 1),
-                         sliderInput("len_2", "Simulation Length", min = 1, max = 1000, value = 300)
-                     ),
-
-                     # Show a plot of the generated distribution
-                     mainPanel(
-                         div("$$\\text{Repressilation System }$$ \
-                                     $$\\frac{dX}{dt}=\\frac{\\beta}{1+(Z/k)^3} - \\gamma{X}$$ \
-                                     $$\\frac{dY}{dt}=\\frac{\\beta}{1+(X/k)^3} - \\gamma{Y}$$ \
-                                     $$\\frac{dZ}{dt}=\\frac{\\beta}{1+(Y/k)^3} - \\gamma{Z}$$"),
-                         plotOutput("Osc3"),
-                         imageOutput("repress")
-                     )
-                 )
-        ),
-
 
         tabPanel("Brusselator",
              sidebarLayout(
@@ -152,15 +130,50 @@ ui <- fluidPage(
 
                  # Show a plot of the generated distribution
                  mainPanel(
+                     h5("The brusselator system shows a noise-free method of achieving indefinite oscillation of X and Y, by incorporating additional dynamics of new components A and B"),
                      div("$$\\text{Brusselator System }$$ \
                                      $$\\frac{dX}{dt}= k_1A - k_2B + k_3X^2Y - k_4X - \\gamma{X}$$ \
                                      $$\\frac{dY}{dt}= k_2BX - k_3X^2Y - \\gamma{Y}$$"),
                      plotOutput("Brussel"),
-                     imageOutput("brussel")
+                     imageOutput("brussel"),
+                     uiOutput("brussellink")
                  )
              )
         ),
-        tabPanel("Repression_2",
+
+        tabPanel("Repressilator",
+                 sidebarLayout(
+                     sidebarPanel(
+                         "Rate constants",
+                         hr(),
+                         sliderInput("Beta", "Protein Generation Rate (\u03B2)", min = 0, max = 20, value = 1),
+                         sliderInput("Gamma", "Protein Degradation Rate (\u03B3)", min = 0, max = 5, value = 0.1, step=0.1),
+                         "Simulation parameters",
+                         hr(),
+                         sliderInput("k", "Protein Concentration Factor", min = 1, max = 20, value = 1),
+                         sliderInput("len_2", "Simulation Length", min = 1, max = 1000, value = 300)
+                     ),
+
+                     # Show a plot of the generated distribution
+                     mainPanel(
+                         h5("This first repressilation system shows how oscillation can occur using a cycle of repression."),
+                         br(),
+                         "In this system, 3 components each repress the following one in the circuit, such that X represses Y, Y represses Z, and Z represses X.",
+                         br(),
+                         "If the other parameters are set correctly (betas are large, gammas are small), then constant, undamped oscillation will occur",
+                         br(),
+                         "Here, the exponential 'Hill cooperativity' parameter is fixed at 3, so we can observe the effect of altering the formation and degradation rates",
+                         div("$$\\text{Repressilation System }$$ \
+                                     $$\\frac{dX}{dt}=\\frac{\\beta}{1+(Z/k)^3} - \\gamma{X}$$ \
+                                     $$\\frac{dY}{dt}=\\frac{\\beta}{1+(X/k)^3} - \\gamma{Y}$$ \
+                                     $$\\frac{dZ}{dt}=\\frac{\\beta}{1+(Y/k)^3} - \\gamma{Z}$$"),
+                         plotOutput("Osc3"),
+                         imageOutput("repress")
+                     )
+                 )
+        ),
+
+        tabPanel("Repressilation Cooperativity",
                  sidebarLayout(
                      sidebarPanel(
                          "Rate constants",
@@ -177,12 +190,13 @@ ui <- fluidPage(
                      # Show a plot of the generated distribution
                      mainPanel(
                          h5("This repressilation system allows you to see the impact of cooperativity"),
+                         "As cooperativity (n) increases above 2, a system of stable oscillations occurs. It is positively impacted by the beta parameter, and negatively by the gamma parameter",
                          div("$$\\text{Repressilation System }$$ \
                                      $$\\frac{dX}{dt}=\\frac{\\beta}{1+(Z/k)^n} - \\gamma{X}$$ \
                                      $$\\frac{dY}{dt}=\\frac{\\beta}{1+(X/k)^n} - \\gamma{Y}$$ \
                                      $$\\frac{dZ}{dt}=\\frac{\\beta}{1+(Y/k)^n} - \\gamma{Z}$$"),
-                         plotOutput("Rep2")
-                         #imageOutput("repress")
+                         plotOutput("Rep2"),
+                         uiOutput("represslink")
                      )
                  )
         )
@@ -209,6 +223,20 @@ server <- function(input, output) {
              width = 250,
              height = 250)
     }, deleteFile = FALSE)
+    url_alon <- a("An Introduction to Systems Biology", href="https://www.amazon.ca/Introduction-Systems-Biology-Principles-Biological-dp-1439837171/dp/1439837171")
+    output$alonlink <- renderUI({
+        tagList("This model was inspired from Chapters 6.1 and 6.2 of the book: ", url_alon)
+    })
+
+    url_brussel <- a("Interactive web-based simulation models with deSolve", href="https://tpetzoldt.github.io/deSolve-shiny/deSolve-shiny.html")
+    output$brussellink <- renderUI({
+        tagList("This model was inspired from the writing of Thomas Petzoldt on using deSolve with Shiny, here: ", url_brussel)
+    })
+
+    url_repress <- a("Blinking bacteria", href="https://biocircuits.github.io/chapters/09_repressilator.html")
+    output$represslink <- renderUI({
+        tagList("This model was inspired from the Python code of Michael Elowitz, here: ", url_repress)
+    })
 
     output$dampOsc <- renderPlot({
 
